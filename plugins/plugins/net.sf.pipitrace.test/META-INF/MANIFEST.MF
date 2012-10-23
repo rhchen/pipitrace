@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Pipitrace Test
+Bundle-SymbolicName: net.sf.pipitrace.test
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: ca.eepp.quatre.java.javeltrace;bundle-version="1.0.0",
+ net.sf.pipitrace.core;bundle-version="1.0.0"

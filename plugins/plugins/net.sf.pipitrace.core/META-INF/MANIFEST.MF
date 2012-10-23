@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Pipitrace Core
+Bundle-SymbolicName: net.sf.pipitrace.core
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.sf.pipitrace.core.PipiTraceActivator
+Require-Bundle: org.eclipse.core.runtime,
+ com.google.guava;bundle-version="13.0.1",
+ net.sf.commonstringutil;bundle-version="1.0.0",
+ org.codehaus.jackson.core;bundle-version="2.1.0",
+ org.codehaus.jackson.databind;bundle-version="2.1.0",
+ com.Ostermiller.util;bundle-version="1.0.0",
+ ca.eepp.quatre.java.javeltrace;bundle-version="1.0.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: net.sf.pipitrace.core,
+ net.sf.pipitrace.core.ftrace,
+ net.sf.pipitrace.core.model
+Bundle-ClassPath: .
