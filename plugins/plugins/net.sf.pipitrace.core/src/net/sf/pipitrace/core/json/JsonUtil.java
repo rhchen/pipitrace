@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.UnmodifiableIterator;
 
@@ -53,34 +54,60 @@ public final class JsonUtil {
 		g.writeStartObject();//{
 		
 			g.writeObjectField("metadata", "external:metadata.tsdl");
-				
+			
 				g.writeArrayFieldStart("packets");//[
 			
 				for(int i=0; i<tableList.size(); i++){
 					
-					ImmutableTable<TracePrefix, TracerType, TraceSuffix> tableData = tableList.get(i);
+						ImmutableTable<TracePrefix, TracerType, TraceSuffix> tableData = tableList.get(i);
 					
-					g.writeStartObject();//{
-					
-						JsonUtil._writeHeaderNode(g);
+						ImmutableSet<TracePrefix> rowSet =  tableData.rowKeySet();
+						 
+						TracePrefix[] tps =rowSet.toArray(new TracePrefix[tableData.size()]);
 						
-						g.writeObjectFieldStart("context");
+						int length = rowSet.size();
 						
-							_writeContext(g, tableData, i);
+						int times = 1000;
+						int size = length / times;
+						
+						for(int ii=0 ; ii<size; ii++){
 							
-						g.writeEndObject();
-					
-						g.writeArrayFieldStart("events");//[
-						
-							_writeEvents(g, tableData);
+								g.writeStartObject();//{
+								
+									JsonUtil._writeHeaderNode(g);
+									
+									int start = ii * times;
+									int end   = (ii + 1) * times - 1;
+									
+									g.writeObjectFieldStart("context");
+									
+										_writeContext(g, tps[start], tps[end], times);
+										
+										g.writeNumberField("cpu_id", i);
+									
+									g.writeEndObject();
+								
+									g.writeArrayFieldStart("events");//[
+									
+										for(int iii=start; iii<=end; iii++){
+											
+											TracePrefix tk = tps[iii];
+											TraceSuffix im = tableData.get(tk, TracerType.SCHED_SWITCH);
+											
+											_writeEvent(g, tk, im);							
+										}
+										
+										//_writeEvents(g, tableData);
+										
+									g.writeEndArray();//]
 							
-						g.writeEndArray();//]
+								g.writeEndObject();//}				
+							
+						}
 						
-					g.writeEndObject();//}
-			
 				}
 				
-			g.writeEndArray();//]
+				g.writeEndArray();//]
 			
 			
 		g.writeEndObject();//}
@@ -89,6 +116,55 @@ public final class JsonUtil {
 		g.close(); // important: will force flushing of output, close underlying output stream
 	}
 	
+	private static void _writeEvent(JsonGenerator g, TracePrefix tk,  TraceSuffix im) throws JsonGenerationException, IOException{
+		
+		String prev_comm  = im.getValue(TraceSuffix.KEY_PREV_COMM);
+		String prev_pid   = im.getValue(TraceSuffix.KEY_PREV_PID);
+		String prev_prio  = im.getValue(TraceSuffix.KEY_PREV_PRIO);
+		String prev_state = im.getValue(TraceSuffix.KEY_PREV_STATE);
+		String next_comm  = im.getValue(TraceSuffix.KEY_NEXT_COMM);
+		String next_pid   = im.getValue(TraceSuffix.KEY_NEXT_PID);
+		String next_prio  = im.getValue(TraceSuffix.KEY_NEXT_PRIO);
+		
+		int i_prev_state = 0;
+		
+		/**
+		 * Need Fix, confirm state mapping
+		 */
+		if(prev_state.equalsIgnoreCase("S")) i_prev_state = 1;
+		if(prev_state.equalsIgnoreCase("R")) i_prev_state = 2;
+		
+		g.writeStartObject();//{
+		
+			g.writeObjectFieldStart("header");
+			
+				g.writeNumberField("id", 0);
+				
+				g.writeObjectFieldStart("v");
+					
+					//g.writeNumberField("id", 0);
+					g.writeNumberField("timestamp", tk.getTimeStamp());
+				
+				g.writeEndObject();
+				
+			g.writeEndObject();
+			
+			g.writeObjectFieldStart("payload");
+			
+				g.writeObjectField("_prev_comm", prev_comm);
+				g.writeNumberField("_prev_tid", Integer.parseInt(prev_pid));
+				g.writeNumberField("_prev_prio", Integer.parseInt(prev_prio));
+				g.writeNumberField("_prev_state", i_prev_state);
+				g.writeObjectField("_next_comm", next_comm);
+				g.writeNumberField("_next_tid", Integer.parseInt(next_pid));
+				g.writeNumberField("_next_prio", Integer.parseInt(next_prio));
+				
+			g.writeEndObject();
+			
+		g.writeEndObject();//}
+		
+	}
+
 	private static void _writeEvents(JsonGenerator g, ImmutableTable<TracePrefix, TracerType, TraceSuffix> tableData) throws JsonGenerationException, IOException{
 		
 		UnmodifiableIterator<TracePrefix> it = tableData.rowKeySet().iterator();
@@ -151,14 +227,12 @@ public final class JsonUtil {
 		}
 	}
 	
-	private static void _writeContext(JsonGenerator g, ImmutableTable<TracePrefix, TracerType, TraceSuffix> tableData, int cpuNum) throws JsonGenerationException, IOException{
+	private static void _writeContext(JsonGenerator g, TracePrefix start, TracePrefix end, int times) throws JsonGenerationException, IOException{
 		
-		TracePrefix[] tps = tableData.rowKeySet().toArray(new TracePrefix[tableData.size()]);
+		long st = start.getTimeStamp();
+		long et = end.getTimeStamp();
 		
-		long st = tps[0].getTimeStamp();
-		long et = tps[tps.length-1].getTimeStamp();
-		
-		long content_size = 448 * tps.length;
+		long content_size = 448 * times;
 		long packet_size  = 65536;
 		// Packet size => content size + padding (up to a multiple of 32768 bits)
 		packet_size = (content_size + 32768 - 1) & ~(32768 - 1);
@@ -168,7 +242,7 @@ public final class JsonUtil {
 		g.writeNumberField("events_discarded", 0);
 		g.writeNumberField("content_size", content_size);
 		g.writeNumberField("packet_size", packet_size);
-		g.writeNumberField("cpu_id", cpuNum);
+		
 	}
 	
 	private static void _writeHeaderNode(JsonGenerator g) throws JsonGenerationException, IOException{
