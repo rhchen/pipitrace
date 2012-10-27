@@ -11,13 +11,19 @@ import net.izhtw.rcp.explorer.master.ApplicationWorkbenchAdvisor;
  */
 public class PipiApplicationWorkbenchAdvisor extends ApplicationWorkbenchAdvisor {
 	
-	private static final String PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective";
+	//private static final String PERSPECTIVE_ID = "org.eclipse.ui.resourcePerspective";
 	//private static final String PERSPECTIVE_ID = "org.eclipse.rcp.explorer.resourcePerspective";
-
+	private static final String LTTNG_PERSPECTIVE_ID = "org.eclipse.linuxtools.lttng2.kernel.ui.perspective";
+    
 	@Override
 	public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
 			IWorkbenchWindowConfigurer configurer) {
 		return new PipiApplicationWorkbenchWindowAdvisor(configurer);
+	}
+
+	@Override
+	public String getInitialWindowPerspectiveId() {
+		return LTTNG_PERSPECTIVE_ID;
 	}
 
 }
