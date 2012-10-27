@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Pipitrace App
+Bundle-SymbolicName: net.sf.pipitrace.app;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: net.sf.pipitrace.app.PipiTraceActivator
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
