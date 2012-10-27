@@ -6,7 +6,7 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="org.eclipse.ui.ide.workbench"
+            application="net.sf.pipitrace.app.PipiApplication"
             name="pipitrace">
          <property
                name="appName"
@@ -14,5 +14,17 @@
          </property>
       </product>
    </extension>
-
+   <extension
+         id="net.sf.pipitrace.app.PipiApplication"
+         name="pipitrace application"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="net.sf.pipitrace.app.PipiApplication">
+         </run>
+      </application>
+   </extension>
 </plugin>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="pipitrace" id="net.sf.pipitrace.app.product" application="org.eclipse.ui.ide.workbench" useFeatures="true" includeLaunchers="true">
+<product name="pipitrace" id="net.sf.pipitrace.app.product" application="net.sf.pipitrace.app.PipiApplication" useFeatures="true" includeLaunchers="true">
 
    <configIni use="default">
    </configIni>
@@ -14,7 +14,7 @@
    </plugins>
 
    <features>
-      <feature id="org.eclipse.platform" version="3.7.2.v20120207-1839-9gF7UHPDFxGjd-PqDr2jX_4yKaumkoHTz04_q-q"/>
+      <feature id="net.izhtw.rcp.explorer.feature" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.linuxtools.ctf" version="1.0.0.qualifier"/>
       <feature id="org.eclipse.linuxtools.tmf" version="1.1.1.qualifier"/>
       <feature id="net.sf.pipitrace" version="1.0.0.qualifier"/>
