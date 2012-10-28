@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.linuxtools.lttng2.kernel.ui.perspective">
+         <view
+               id="net.sf.pipitrace.ui.views.LoadHistogramView"
+               minimized="false"
+               relationship="stack">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="net.sf.pipitrace.ui.views.LoadHistogramView"
+            icon="icons/eview16/histogram.gif"
+            id="net.sf.pipitrace.ui.views.LoadHistogramView"
+            name="LoadHistogramView"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>
