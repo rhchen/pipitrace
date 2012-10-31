@@ -6,15 +6,21 @@
       <perspectiveExtension
             targetID="org.eclipse.linuxtools.lttng2.kernel.ui.perspective">
          <view
+               closeable="true"
                id="net.sf.pipitrace.ui.views.LoadHistogramView"
                minimized="false"
-               relationship="stack">
+               moveable="true"
+               relationship="stack"
+               relative="org.eclipse.linuxtools.tmf.ui.views.histogram"
+               showTitle="true"
+               visible="true">
          </view>
       </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <view
+            category="org.eclipse.linuxtools.tmf.ui.views.category"
             class="net.sf.pipitrace.ui.views.LoadHistogramView"
             icon="icons/eview16/histogram.gif"
             id="net.sf.pipitrace.ui.views.LoadHistogramView"
