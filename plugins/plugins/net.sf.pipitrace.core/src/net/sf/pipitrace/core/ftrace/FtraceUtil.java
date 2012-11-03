@@ -3,6 +3,7 @@ package net.sf.pipitrace.core.ftrace;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,12 +16,28 @@ import net.sf.commonstringutil.StringUtil;
 import net.sf.pipitrace.core.model.TracePrefix;
 import net.sf.pipitrace.core.model.TraceSuffix;
 
+import com.Ostermiller.util.CircularByteBuffer;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableTable.Builder;
 
 public class FtraceUtil {
 
+	public static InputStream parse(FileChannel fileChannel, boolean is) throws IOException{
+		
+		MappedByteBuffer mmb = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
+
+		byte[] buffer = new byte[(int) fileChannel.size()];
+		
+		mmb.get(buffer);
+		
+		CircularByteBuffer circularByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+		
+		circularByteBuffer.getOutputStream().write(buffer);
+		
+		return circularByteBuffer.getInputStream();
+	}
+	
 	public static ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> parse(FileChannel fileChannel) throws IOException{
 		
 		MappedByteBuffer mmb = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
