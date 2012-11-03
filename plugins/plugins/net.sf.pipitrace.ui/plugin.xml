@@ -21,7 +21,7 @@
          point="org.eclipse.ui.views">
       <view
             category="org.eclipse.linuxtools.tmf.ui.views.category"
-            class="net.sf.pipitrace.ui.views.LoadHistogramView"
+            class="net.sf.pipitrace.ui.views.histogram.LoadHistogramView"
             icon="icons/eview16/histogram.gif"
             id="net.sf.pipitrace.ui.views.LoadHistogramView"
             name="LoadHistogramView"
