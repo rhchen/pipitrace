@@ -157,7 +157,29 @@ public abstract class LoadHistogram implements ControlListener, PaintListener, K
         fCanvas.addMouseListener(this);
         fCanvas.addMouseTrackListener(this);
     }
+    
+    
+    /**
+     * Extend Standard constructor.
+     *
+     * @param view A reference to the parent TMF view.
+     * @param parent A parent composite
+     * @param load data model
+     */
+    public LoadHistogram(final TmfView view, final Composite parent, LoadHistogramDataModel loadHistogramDataModel) {
+        fParentView = view;
 
+        createWidget(parent);
+        fDataModel = loadHistogramDataModel;
+        fDataModel.addHistogramListener(this);
+        clear();
+
+        fCanvas.addControlListener(this);
+        fCanvas.addPaintListener(this);
+        fCanvas.addKeyListener(this);
+        fCanvas.addMouseListener(this);
+        fCanvas.addMouseTrackListener(this);
+    }
     /**
      * Dispose resources and deregisters listeners.
      */

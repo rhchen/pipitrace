@@ -44,8 +44,8 @@ public class LoadTimeRangeHistogram extends LoadHistogram {
      * @param view The parent histogram view
      * @param parent The parent composite
      */
-    public LoadTimeRangeHistogram(LoadHistogramView view, Composite parent) {
-        super(view, parent);
+    public LoadTimeRangeHistogram(LoadHistogramView view, Composite parent,  LoadHistogramDataModel loadHistogramDataModel) {
+        super(view, parent, loadHistogramDataModel);
         fZoom = new LoadHistogramZoom(this, fCanvas, getStartTime(), getTimeLimit());
     }
 

@@ -59,8 +59,8 @@ public class LoadFullTraceHistogram extends LoadHistogram implements MouseMoveLi
      * @param view A reference to the parent histogram view 
      * @param parent A reference to the parent composite
      */
-    public LoadFullTraceHistogram(LoadHistogramView view, Composite parent) {
-        super(view, parent);
+    public LoadFullTraceHistogram(LoadHistogramView view, Composite parent,  LoadHistogramDataModel loadHistogramDataModel) {
+        super(view, parent, loadHistogramDataModel);
         fZoom = new LoadHistogramZoom(this, fCanvas, getStartTime(), getTimeLimit());
         fCanvas.addMouseMoveListener(this);
     }

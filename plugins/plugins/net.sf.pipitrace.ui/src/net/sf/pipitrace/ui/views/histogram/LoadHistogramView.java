@@ -174,9 +174,8 @@ public class LoadHistogramView extends TmfView {
         timeRangeComposite.setLayoutData(gridData);
 
         // Histogram
-        fTimeRangeHistogram = new LoadTimeRangeHistogram(this, timeRangeComposite){
-        	
-        };
+        LoadHistogramDataModel trLoadHistogramDataModel = new LoadHistogramDataModel();
+        fTimeRangeHistogram = new LoadTimeRangeHistogram(this, timeRangeComposite, trLoadHistogramDataModel);
 
         // --------------------------------------------------------------------
         // Full range histogram
@@ -203,7 +202,8 @@ public class LoadHistogramView extends TmfView {
         fullRangeComposite.setLayoutData(gridData);
 
         // Histogram
-        fFullTraceHistogram = new LoadFullTraceHistogram(this, fullRangeComposite);
+        LoadHistogramDataModel ftLoadHistogramDataModel = new LoadHistogramDataModel();
+        fFullTraceHistogram = new LoadFullTraceHistogram(this, fullRangeComposite, ftLoadHistogramDataModel);
 
         // Load the experiment if present
         fCurrentExperiment = (TmfExperiment<ITmfEvent>) TmfExperiment.getCurrentExperiment();
