@@ -52,15 +52,17 @@ public class FtraceUtil {
 		
 		ArrayList<ImmutableTable.Builder<TracePrefix, TracerType, TraceSuffix>> builderList = Lists.newArrayList();
 		
+		Pattern pt_sched_switch = Pattern.compile("(?i).*sched_switch.*", Pattern.CASE_INSENSITIVE);
+		
 		for (line = in.readLine(); line != null; line = in.readLine()) {
 
 			boolean st = StringUtil.startsWithIgnoreCase(line, "#");
 
 			if (!st) {
 
-				Pattern pt_sched_switch = Pattern.compile("(?i).*sched_switch.*", Pattern.CASE_INSENSITIVE);
+				//boolean find = pt_sched_switch.matcher(line).find();
 				
-				boolean find = pt_sched_switch.matcher(line).find();
+				boolean find = StringUtil.matchRegex(".*sched_switch.*", line);
 				
 				if(find){
 					
