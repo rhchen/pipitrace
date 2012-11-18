@@ -38,7 +38,17 @@ public class TraceSuffix extends TraceBiMap{
 		
 		traceSuffStr = StringUtil.replace(traceSuffStr, " ", ",");
 		
-		Map<String, String> map = Splitter.on(',').trimResults().withKeyValueSeparator("=").split(traceSuffStr);
+		Map<String, String> map = null;
+		
+		try{
+			
+			map = Splitter.on(',').trimResults().withKeyValueSeparator("=").split(traceSuffStr);
+		
+		}catch(Exception e){
+			
+			System.out.println("traceSuffStr : "+ traceSuffStr);
+			
+		}
 		
 		ImmutableMap<String, String> im = ImmutableMap.<String, String>builder().putAll(map).build();
 		
