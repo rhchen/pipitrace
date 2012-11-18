@@ -46,6 +46,7 @@ public class TraceSuffix extends TraceBiMap{
 		
 		}catch(Exception e){
 			
+			e.printStackTrace();
 			System.out.println("traceSuffStr : "+ traceSuffStr);
 			
 		}

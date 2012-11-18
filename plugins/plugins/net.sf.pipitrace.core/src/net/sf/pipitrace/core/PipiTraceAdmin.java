@@ -13,6 +13,7 @@ import java.net.URL;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -37,11 +38,14 @@ import ca.eepp.quatre.java.javeltrace.translation.Translator;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import net.sf.commonstringutil.StringUtil;
+import net.sf.pipitrace.core.events.FlowControl;
+import net.sf.pipitrace.core.events.SchedEvent;
 import net.sf.pipitrace.core.ftrace.FtraceUtil;
-import net.sf.pipitrace.core.ftrace.SchedHandler;
 import net.sf.pipitrace.core.ftrace.TracerType;
+import net.sf.pipitrace.core.handler.SchedHandler;
 import net.sf.pipitrace.core.json.JsonUtil;
 import net.sf.pipitrace.core.model.TracePrefix;
 import net.sf.pipitrace.core.model.TraceSuffix;
@@ -62,7 +66,7 @@ public class PipiTraceAdmin {
 		
 		EventBus eventBus = new EventBus();
 		
-		SchedHandler schedHandler = new SchedHandler();
+		SchedHandler schedHandler = new SchedHandler(eventBus);
 		
 		eventBus.register(schedHandler);
 		
@@ -88,8 +92,6 @@ public class PipiTraceAdmin {
 
 			String line;
 			
-			ArrayList<ImmutableTable.Builder<TracePrefix, TracerType, TraceSuffix>> builderList = Lists.newArrayList();
-			
 			int count = 0;
 			
 			Pattern pt_sched_switch = Pattern.compile("(?i).*sched_switch.*", Pattern.CASE_INSENSITIVE);
@@ -106,7 +108,7 @@ public class PipiTraceAdmin {
 					
 					if(find){
 						
-						eventBus.post(line);
+						eventBus.post(new SchedEvent(line));
 						
 						count ++;
 					}
@@ -114,54 +116,15 @@ public class PipiTraceAdmin {
 				
 			}
 			
+			eventBus.post(FlowControl.READ_DONE);
+			
 			eventBus.unregister(schedHandler);
 			
 			long delta =  System.currentTimeMillis() - start;
 			System.out.println("time use read data : " + delta +" count : "+ count);
 			start = System.currentTimeMillis();
 			
-//			ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList = FtraceUtil.parse(fileChannel);
-//			
-//			long delta =  System.currentTimeMillis() - start;
-//			System.out.println("time use read data : " + delta);
-//			start = System.currentTimeMillis();
-//			
-//			InputStream inputStream = JsonUtil.toJson(tableList);
-//			 
-//			delta =  System.currentTimeMillis() - start;
-//			System.out.println("time use to json : " + delta);
-//			start = System.currentTimeMillis();
-//			
-//			String out = "C:\\tmp\\javeltrace\\debug";
-//			String metadataPath = "metadata/metadata.tsdl";
-//			
-////			Bundle bundle = Platform.getBundle(PipiTraceActivator.getContext().getBundle().getSymbolicName());
-////	        URL fileURL = bundle.getEntry(metadataPath);
-////	        File mp = new File(FileLocator.resolve(fileURL).toURI());
-//	        File mp = new File("D:\\work\\eclipse421\\workspace\\pipitrace\\plugins\\net.sf.pipitrace.core\\metadata\\metadata.tsdl");
-//	        
-//			IStreamedReader reader =  new JSONCTFStreamedReader(mp, inputStream);
-//			IWriter writer = new BinaryCTFWriter(out);
-//			
-//			StreamedTraceInput input = new StreamedTraceInput(reader);
-//			input.open();
-//			
-//			BufferedTraceOutput output = new BufferedTraceOutput(input.getTraceParameters(), writer);
-//			output.setShrinkPacketSize(true);
-//			output.setWriteIfEmpty(false);
-//			output.open();
-//			
-//			// Translator
-//            Translator translator = new Translator(input, output);
-//            translator.translate();
-//            
-//            input.close();
-//            output.close();
-//            
-//            delta =  System.currentTimeMillis() - start;
-//			System.out.println("time use to ctf : " + delta);
-//			start = System.currentTimeMillis();
-			
+
 		} catch (FileNotFoundException e) {
 			
 			e.printStackTrace();
@@ -171,18 +134,6 @@ public class PipiTraceAdmin {
 			e.printStackTrace();
 		
 		} catch (WrongStateException e) {
-			
-			e.printStackTrace();
-		
-//		} catch (TraceInputException e) {
-//		
-//			e.printStackTrace();
-//		
-//		} catch (TraceOutputException e) {
-//			
-//			e.printStackTrace();
-//		
-//		} catch (TraceException e) {
 			
 			e.printStackTrace();
 		
