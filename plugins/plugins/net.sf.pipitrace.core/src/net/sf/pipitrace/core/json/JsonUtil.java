@@ -22,6 +22,24 @@ public final class JsonUtil {
 
 	private static final long PACKET_HEADER_MAGIC_NUMBER = 0xc1fc1fc1L;
 	
+	public static void WritePacketsStart(JsonGenerator g) throws JsonGenerationException, IOException{
+		
+		_writePacketsStart(g);
+		
+	}
+	
+	public static void Write(JsonGenerator g, ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList) throws JsonGenerationException, IOException{
+		
+		_write(g, tableList);
+		
+	}
+	
+	public static void WritePacketsEnd(JsonGenerator g) throws JsonGenerationException, IOException{
+		
+		_writePacketsEnd(g);
+		
+	}
+	
 	public static InputStream toJson(ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList) throws IOException{
 		
 		 /*
@@ -35,7 +53,11 @@ public final class JsonUtil {
         
 		g.useDefaultPrettyPrinter();
 		
+		_writePacketsStart(g);
+		
 		_write(g, tableList);
+		
+		_writePacketsEnd(g);
 		
 		return circularByteBuffer.getInputStream();
 		
@@ -49,13 +71,33 @@ public final class JsonUtil {
 		g.useDefaultPrettyPrinter();
 	}
 	
-	private static void _write(JsonGenerator g, ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList) throws JsonGenerationException, IOException{
+	private static void _writePacketsStart(JsonGenerator g) throws JsonGenerationException, IOException{
 		
 		g.writeStartObject();//{
 		
-			g.writeObjectField("metadata", "external:metadata.tsdl");
-			
-				g.writeArrayFieldStart("packets");//[
+		g.writeObjectField("metadata", "external:metadata.tsdl");
+		
+			g.writeArrayFieldStart("packets");//[
+	}
+	
+	private static void _writePacketsEnd(JsonGenerator g) throws JsonGenerationException, IOException{
+		
+		 	g.writeEndArray();//]
+		
+		
+		g.writeEndObject();//}
+		
+		
+		g.close(); // important: will force flushing of output, close underlying output stream
+	}
+	
+	private static void _write(JsonGenerator g, ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList) throws JsonGenerationException, IOException{
+		
+//		g.writeStartObject();//{
+//		
+//			g.writeObjectField("metadata", "external:metadata.tsdl");
+//			
+//				g.writeArrayFieldStart("packets");//[
 			
 				for(int i=0; i<tableList.size(); i++){
 					
@@ -107,13 +149,13 @@ public final class JsonUtil {
 						
 				}
 				
-				g.writeEndArray();//]
-			
-			
-		g.writeEndObject();//}
-		
-		
-		g.close(); // important: will force flushing of output, close underlying output stream
+//				g.writeEndArray();//]
+//			
+//			
+//		g.writeEndObject();//}
+//		
+//		
+//		g.close(); // important: will force flushing of output, close underlying output stream
 	}
 	
 	private static void _writeEvent(JsonGenerator g, TracePrefix tk,  TraceSuffix im) throws JsonGenerationException, IOException{

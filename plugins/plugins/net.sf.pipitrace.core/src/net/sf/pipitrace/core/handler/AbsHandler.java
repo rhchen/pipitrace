@@ -25,6 +25,10 @@ import ca.eepp.quatre.java.javeltrace.trace.writer.BinaryCTFWriter;
 import ca.eepp.quatre.java.javeltrace.trace.writer.IWriter;
 import ca.eepp.quatre.java.javeltrace.translation.Translator;
 
+import com.Ostermiller.util.CircularByteBuffer;
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableTable.Builder;
@@ -37,46 +41,82 @@ public abstract class AbsHandler {
 
 	protected ArrayList<ImmutableTable.Builder<TracePrefix, TracerType, TraceSuffix>> builderList = Lists.newArrayList();
 	
+	private static MappingJsonFactory fjs = new MappingJsonFactory();
+	private static CircularByteBuffer circularByteBuffer = new CircularByteBuffer(CircularByteBuffer.INFINITE_SIZE);
+	private static JsonGenerator g = null;
+	
+	private static long start;
+	
 	public AbsHandler(EventBus eventBus) {
 		super();
 		this.eventBus = eventBus;
 	}
 
 	@Subscribe
-    public void recieveFlowControl(FlowControl event) {
+    public void recieveFlowControl(FlowControl event) throws IOException {
 		
 		if(event == FlowControl.READ_DONE){
 			
-			ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList = Lists.newArrayList();
+			ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList = _toTableList();
 			
-			Iterator<Builder<TracePrefix, TracerType, TraceSuffix>> it = builderList.iterator();
+			JsonUtil.Write(g, tableList);
 			
-			while(it.hasNext()){
+			JsonUtil.WritePacketsEnd(g);
+			
+			long delta =  System.currentTimeMillis() - start;
+			System.out.println("time use read data : " + delta);
+			
+			_toJson();
+			
+		}else if(event == FlowControl.FLUSH){
+			
+			ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList = _toTableList();
+			
+			if(g == null){
 				
-				tableList.add(it.next().build());
+				start = System.currentTimeMillis();
 				
+				g = fjs.createJsonGenerator(circularByteBuffer.getOutputStream(), JsonEncoding.UTF8);
+				g.useDefaultPrettyPrinter();
+				
+				JsonUtil.WritePacketsStart(g);
+			
 			}
 			
-			_toJson(tableList);
-			
+			JsonUtil.Write(g, tableList);
 		}
 		
 		
 	}
 	
-	private void _toJson(ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList){
+	private ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> _toTableList(){
+	
+		ArrayList<ImmutableTable<TracePrefix, TracerType, TraceSuffix>> tableList = Lists.newArrayList();
+		
+		Iterator<Builder<TracePrefix, TracerType, TraceSuffix>> it = builderList.iterator();
+		
+		while(it.hasNext()){
+			
+			tableList.add(it.next().build());
+			
+		}
+		
+		builderList.clear();
+		
+		return tableList;
+		
+	}
+	
+	private void _toJson(){
 		
 		try {
 			
 			long start = System.currentTimeMillis();
 			
-			InputStream inputStream = JsonUtil.toJson(tableList);
+			InputStream inputStream = circularByteBuffer.getInputStream();
+			
+			//InputStream inputStream = JsonUtil.toJson(tableList);
 			 
-			long delta =  System.currentTimeMillis() - start;
-			System.out.println("time use to json : " + delta);
-			
-			start = System.currentTimeMillis();
-			
 			String out = "C:\\tmp\\javeltrace\\debug";
 			String metadataPath = "metadata/metadata.tsdl";
 			
@@ -100,17 +140,9 @@ public abstract class AbsHandler {
 	        input.close();
 	        output.close();
 	        
-	        delta =  System.currentTimeMillis() - start;
+	        long delta =  System.currentTimeMillis() - start;
 			System.out.println("time use to ctf : " + delta);
 			start = System.currentTimeMillis();
-		
-		} catch (FileNotFoundException e) {
-			
-			e.printStackTrace();
-		
-		} catch (IOException e) {
-			
-			e.printStackTrace();
 		
 		} catch (WrongStateException e) {
 			

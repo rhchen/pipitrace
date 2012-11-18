@@ -111,6 +111,13 @@ public class PipiTraceAdmin {
 						eventBus.post(new SchedEvent(line));
 						
 						count ++;
+						
+						if(count == 10000){
+							
+							eventBus.post(FlowControl.FLUSH);
+							
+							count = 0;
+						} 
 					}
 				}
 				
