@@ -74,7 +74,7 @@ public class FtraceUtil {
 					String suffStr = list.get(1);
 					
 					TracePrefix prefObj = TracePrefix.create(prefStr);
-					TraceSuffix suffObj = TraceSuffix.create(suffStr);
+					TraceSuffix suffObj = TraceSuffix._create_sched_switch(suffStr);
 					
 					int cpuNum = prefObj.getCpuNum();
 					

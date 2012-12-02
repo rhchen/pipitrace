@@ -43,6 +43,7 @@ import com.google.common.eventbus.Subscribe;
 import net.sf.commonstringutil.StringUtil;
 import net.sf.pipitrace.core.events.FlowControl;
 import net.sf.pipitrace.core.events.SchedEvent;
+import net.sf.pipitrace.core.events.SoftIrqEvent;
 import net.sf.pipitrace.core.ftrace.FtraceUtil;
 import net.sf.pipitrace.core.ftrace.TracerType;
 import net.sf.pipitrace.core.handler.SchedHandler;
@@ -102,13 +103,32 @@ public class PipiTraceAdmin {
 
 				if (!st) {
 
-					boolean find = StringUtil.matchRegex(".*sched_switch.*", line);
+					/*
+					 * Sched_Switch
+					 */
+					boolean find_sched_switch = StringUtil.matchRegex(".*sched_switch.*", line);
 					
 					//boolean find = pt_sched_switch.matcher(line).find();
 					
-					if(find){
+					if(find_sched_switch){
 						
 						eventBus.post(new SchedEvent(line));
+						
+						count ++;
+						
+						if(count == 10000){
+							
+							eventBus.post(FlowControl.FLUSH);
+							
+							count = 0;
+						} 
+					}
+					
+					boolean find_soft_irq = StringUtil.matchRegex(".*softirq_.*", line);
+					
+					if(find_soft_irq){
+						
+						eventBus.post(new SoftIrqEvent(line));
 						
 						count ++;
 						

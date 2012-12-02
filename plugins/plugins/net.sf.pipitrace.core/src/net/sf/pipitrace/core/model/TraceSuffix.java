@@ -34,8 +34,50 @@ public class TraceSuffix extends TraceBiMap{
 		
 	}
 	
-	public static TraceSuffix create(String traceSuffStr){
+	public static TraceSuffix _create_sched_switch(String traceSuffStr){
 		
+		traceSuffStr = StringUtil.replace(traceSuffStr, " ", ",");
+		
+		Map<String, String> map = null;
+		
+		try{
+			
+			map = Splitter.on(',').trimResults().withKeyValueSeparator("=").split(traceSuffStr);
+		
+		}catch(Exception e){
+			
+			e.printStackTrace();
+			System.out.println("traceSuffStr : "+ traceSuffStr);
+			
+		}
+		
+		ImmutableMap<String, String> im = ImmutableMap.<String, String>builder().putAll(map).build();
+		
+		UnmodifiableIterator<String> it = im.keySet().iterator();
+		
+		Builder<Integer, Integer> builder = ImmutableMap.<Integer, Integer>builder();
+		
+		while(it.hasNext()){
+			
+			String key = it.next();
+			String value = im.get(key);
+			
+			int iKey = getIntValue(key.trim());
+			
+			int iValue = getIntValue(value.trim());
+			
+			builder.put(iKey, iValue);
+		}
+		
+		ImmutableMap<Integer, Integer> vm = builder.build();
+		
+		return new TraceSuffix(vm);
+	}
+	
+	public static TraceSuffix _create_soft_irq(String traceSuffStr){
+		
+		traceSuffStr = StringUtil.replace(traceSuffStr, "[", "");
+		traceSuffStr = StringUtil.replace(traceSuffStr, "]", "");
 		traceSuffStr = StringUtil.replace(traceSuffStr, " ", ",");
 		
 		Map<String, String> map = null;

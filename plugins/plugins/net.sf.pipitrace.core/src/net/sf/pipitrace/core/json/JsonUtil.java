@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Map;
 
 import net.sf.pipitrace.core.ftrace.TracerType;
 import net.sf.pipitrace.core.model.TracePrefix;
@@ -14,6 +15,7 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.UnmodifiableIterator;
@@ -103,11 +105,19 @@ public final class JsonUtil {
 					
 						ImmutableTable<TracePrefix, TracerType, TraceSuffix> tableData = tableList.get(i);
 					
-						ImmutableSet<TracePrefix> rowSet =  tableData.rowKeySet();
-						 
-						TracePrefix[] tps =rowSet.toArray(new TracePrefix[tableData.size()]);
+						ImmutableMap<TracerType, Map<TracePrefix, TraceSuffix>>  columnMap = tableData.columnMap();
 						
-						int length = rowSet.size();
+						Map<TracePrefix, TraceSuffix> dataMap = columnMap.get(TracerType.SCHED_SWITCH);
+						
+						TracePrefix[] tps = dataMap.keySet().toArray(new TracePrefix[dataMap.size()]);
+						
+						//ImmutableSet<TracePrefix> rowSet =  tableData.rowKeySet();
+						 
+						//TracePrefix[] tps = rowSet.toArray(new TracePrefix[tableData.size()]);
+						
+						int length = dataMap.size();
+						
+						//int length = rowSet.size();
 						
 						int times = 1000;
 						int size = length / times;
