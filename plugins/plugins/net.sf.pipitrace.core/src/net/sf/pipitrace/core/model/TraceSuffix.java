@@ -76,8 +76,8 @@ public class TraceSuffix extends TraceBiMap{
 	
 	public static TraceSuffix _create_soft_irq(String traceSuffStr){
 		
-		traceSuffStr = StringUtil.replace(traceSuffStr, "[", "");
-		traceSuffStr = StringUtil.replace(traceSuffStr, "]", "");
+		traceSuffStr = StringUtil.replaceFirst(traceSuffStr, "[", "");
+		traceSuffStr = StringUtil.replaceLast(traceSuffStr, "]", "");
 		traceSuffStr = StringUtil.replace(traceSuffStr, " ", ",");
 		
 		Map<String, String> map = null;

@@ -1,9 +1,5 @@
 /* CTF 1.8 */
 
-/* CTF 1.8 */
-
-/* CTF 1.8 */
-
 typealias integer { size = 8; align = 8; signed = false; } := uint8_t;
 typealias integer { size = 16; align = 8; signed = false; } := uint16_t;
 typealias integer { size = 32; align = 8; signed = false; } := uint32_t;
@@ -99,6 +95,8 @@ stream {
 	packet.context := struct packet_context;
 };
 
+/* Sched Switch Define */
+
 event {
 	name = sched_switch;
 	id = 0;
@@ -114,3 +112,51 @@ event {
 	};
 };
 
+/* Soft IRQ Define */
+
+event {
+	name = irq_handler_exit;
+	id = 4;
+	stream_id = 0;
+	fields := struct {
+		integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _irq;
+		integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _ret;
+	};
+};
+
+event {
+	name = irq_handler_entry;
+	id = 3;
+	stream_id = 0;
+	fields := struct {
+		integer { size = 32; align = 8; signed = 1; encoding = none; base = 10; } _irq;
+		string _name;
+	};
+};
+
+event {
+	name = softirq_raise;
+	id = 2;
+	stream_id = 0;
+	fields := struct {
+		integer { size = 32; align = 8; signed = 0; encoding = none; base = 10; } _vec;
+	};
+};
+
+event {
+	name = softirq_exit;
+	id = 1;
+	stream_id = 0;
+	fields := struct {
+		integer { size = 32; align = 8; signed = 0; encoding = none; base = 10; } _vec;
+	};
+};
+
+event {
+	name = softirq_entry;
+	id = 5;
+	stream_id = 0;
+	fields := struct {
+		integer { size = 32; align = 8; signed = 0; encoding = none; base = 10; } _vec;
+	};
+};
